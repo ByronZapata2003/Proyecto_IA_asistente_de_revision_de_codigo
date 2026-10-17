@@ -1,0 +1,296 @@
+[
+  {
+    "coleccion": 1,
+    "numero": 1,
+    "titulo": "Sistema inteligente de gestión de requisitos",
+    "carpeta": "Coleccion_1/01_sistema_inteligente_de_gestion_de_requisitos",
+    "modelo": "texto"
+  },
+  {
+    "coleccion": 1,
+    "numero": 2,
+    "titulo": "Clasificador inteligente de incidencias de software",
+    "carpeta": "Coleccion_1/02_clasificador_inteligente_de_incidencias_de_software",
+    "modelo": "texto"
+  },
+  {
+    "coleccion": 1,
+    "numero": 3,
+    "titulo": "Asistente de revisión de código",
+    "carpeta": "Coleccion_1/03_asistente_de_revision_de_codigo",
+    "modelo": "imagen"
+  },
+  {
+    "coleccion": 1,
+    "numero": 4,
+    "titulo": "Predicción de defectos de software",
+    "carpeta": "Coleccion_1/04_prediccion_de_defectos_de_software",
+    "modelo": "regresion"
+  },
+  {
+    "coleccion": 1,
+    "numero": 5,
+    "titulo": "Sistema de recomendación de tareas para equipos ágiles",
+    "carpeta": "Coleccion_1/05_sistema_de_recomendacion_de_tareas_para_equipos_agiles",
+    "modelo": "anomalia"
+  },
+  {
+    "coleccion": 1,
+    "numero": 6,
+    "titulo": "Plataforma de pruebas de software con generación asistida",
+    "carpeta": "Coleccion_1/06_plataforma_de_pruebas_de_software_con_generacion_asistida",
+    "modelo": "anomalia"
+  },
+  {
+    "coleccion": 1,
+    "numero": 7,
+    "titulo": "Detector de anomalías en logs de aplicaciones",
+    "carpeta": "Coleccion_1/07_detector_de_anomalias_en_logs_de_aplicaciones",
+    "modelo": "anomalia"
+  },
+  {
+    "coleccion": 1,
+    "numero": 8,
+    "titulo": "Sistema inteligente de mesa de ayuda universitaria",
+    "carpeta": "Coleccion_1/08_sistema_inteligente_de_mesa_de_ayuda_universitaria",
+    "modelo": "texto"
+  },
+  {
+    "coleccion": 1,
+    "numero": 9,
+    "titulo": "Gestor inteligente de proyectos con predicción de retrasos",
+    "carpeta": "Coleccion_1/09_gestor_inteligente_de_proyectos_con_prediccion_de_retrasos",
+    "modelo": "regresion"
+  },
+  {
+    "coleccion": 1,
+    "numero": 10,
+    "titulo": "Sistema de análisis de sentimiento para calidad de software",
+    "carpeta": "Coleccion_1/10_sistema_de_analisis_de_sentimiento_para_calidad_de_software",
+    "modelo": "texto"
+  },
+  {
+    "coleccion": 1,
+    "numero": 11,
+    "titulo": "Plataforma de mantenimiento predictivo de activos TI",
+    "carpeta": "Coleccion_1/11_plataforma_de_mantenimiento_predictivo_de_activos_ti",
+    "modelo": "regresion"
+  },
+  {
+    "coleccion": 1,
+    "numero": 12,
+    "titulo": "Sistema de visión artificial para control de calidad",
+    "carpeta": "Coleccion_1/12_sistema_de_vision_artificial_para_control_de_calidad",
+    "modelo": "imagen"
+  },
+  {
+    "coleccion": 1,
+    "numero": 13,
+    "titulo": "Gestión inteligente de historias de usuario y estimación",
+    "carpeta": "Coleccion_1/13_gestion_inteligente_de_historias_de_usuario_y_estimacion",
+    "modelo": "anomalia"
+  },
+  {
+    "coleccion": 1,
+    "numero": 14,
+    "titulo": "Plataforma DevSecOps con priorización inteligente",
+    "carpeta": "Coleccion_1/14_plataforma_devsecops_con_priorizacion_inteligente",
+    "modelo": "anomalia"
+  },
+  {
+    "coleccion": 1,
+    "numero": 15,
+    "titulo": "Sistema de accesibilidad web asistido por IA",
+    "carpeta": "Coleccion_1/15_sistema_de_accesibilidad_web_asistido_por_ia",
+    "modelo": "anomalia"
+  },
+  {
+    "coleccion": 1,
+    "numero": 16,
+    "titulo": "Plataforma de detección de fraude académico en entregas de código",
+    "carpeta": "Coleccion_1/16_plataforma_de_deteccion_de_fraude_academico_en_entregas_de_codigo",
+    "modelo": "anomalia"
+  },
+  {
+    "coleccion": 1,
+    "numero": 17,
+    "titulo": "Sistema inteligente de gestión documental y clasificación",
+    "carpeta": "Coleccion_1/17_sistema_inteligente_de_gestion_documental_y_clasificacion",
+    "modelo": "texto"
+  },
+  {
+    "coleccion": 1,
+    "numero": 18,
+    "titulo": "Sistema de pronóstico de demanda con arquitectura empresarial",
+    "carpeta": "Coleccion_1/18_sistema_de_pronostico_de_demanda_con_arquitectura_empresarial",
+    "modelo": "regresion"
+  },
+  {
+    "coleccion": 2,
+    "numero": 1,
+    "titulo": "Sistema inteligente de gestión de filas y tiempos de espera",
+    "carpeta": "Coleccion_2/01_sistema_inteligente_de_gestion_de_filas_y_tiempos_de_espera",
+    "modelo": "regresion"
+  },
+  {
+    "coleccion": 2,
+    "numero": 2,
+    "titulo": "Plataforma inteligente de gestión de donaciones y distribución de ayudas 12",
+    "carpeta": "Coleccion_2/02_plataforma_inteligente_de_gestion_de_donaciones_y_distribucion_de",
+    "modelo": "anomalia"
+  },
+  {
+    "coleccion": 2,
+    "numero": 3,
+    "titulo": "Sistema de monitoreo inteligente de redes informáticas",
+    "carpeta": "Coleccion_2/03_sistema_de_monitoreo_inteligente_de_redes_informaticas",
+    "modelo": "anomalia"
+  },
+  {
+    "coleccion": 2,
+    "numero": 4,
+    "titulo": "Plataforma de gestión de restaurantes con predicción de demanda",
+    "carpeta": "Coleccion_2/04_plataforma_de_gestion_de_restaurantes_con_prediccion_de_demanda",
+    "modelo": "regresion"
+  },
+  {
+    "coleccion": 2,
+    "numero": 5,
+    "titulo": "Sistema inteligente para gestión de préstamos de equipos universitarios 21",
+    "carpeta": "Coleccion_2/05_sistema_inteligente_para_gestion_de_prestamos_de_equipos_universi",
+    "modelo": "anomalia"
+  },
+  {
+    "coleccion": 2,
+    "numero": 6,
+    "titulo": "Plataforma inteligente de análisis de reuniones",
+    "carpeta": "Coleccion_2/06_plataforma_inteligente_de_analisis_de_reuniones",
+    "modelo": "anomalia"
+  },
+  {
+    "coleccion": 2,
+    "numero": 7,
+    "titulo": "Sistema de gestión de mantenimiento de software con priorización de",
+    "carpeta": "Coleccion_2/07_sistema_de_gestion_de_mantenimiento_de_software_con_priorizacion_",
+    "modelo": "anomalia"
+  },
+  {
+    "coleccion": 2,
+    "numero": 8,
+    "titulo": "Plataforma inteligente para análisis de experiencia del cliente omnicanal 30",
+    "carpeta": "Coleccion_2/08_plataforma_inteligente_para_analisis_de_experiencia_del_cliente_o",
+    "modelo": "anomalia"
+  },
+  {
+    "coleccion": 2,
+    "numero": 9,
+    "titulo": "Sistema de monitoreo de cultivos con predicción de necesidades de riego 33",
+    "carpeta": "Coleccion_2/09_sistema_de_monitoreo_de_cultivos_con_prediccion_de_necesidades_de",
+    "modelo": "regresion"
+  },
+  {
+    "coleccion": 2,
+    "numero": 10,
+    "titulo": "Plataforma de gestión de gimnasios con recomendación de actividades 36",
+    "carpeta": "Coleccion_2/10_plataforma_de_gestion_de_gimnasios_con_recomendacion_de_actividad",
+    "modelo": "anomalia"
+  },
+  {
+    "coleccion": 2,
+    "numero": 11,
+    "titulo": "Sistema inteligente de análisis de documentos de soporte técnico",
+    "carpeta": "Coleccion_2/11_sistema_inteligente_de_analisis_de_documentos_de_soporte_tecnico",
+    "modelo": "texto"
+  },
+  {
+    "coleccion": 2,
+    "numero": 12,
+    "titulo": "Plataforma de administración de condominios con clasificación de",
+    "carpeta": "Coleccion_2/12_plataforma_de_administracion_de_condominios_con_clasificacion_de",
+    "modelo": "texto"
+  },
+  {
+    "coleccion": 2,
+    "numero": 13,
+    "titulo": "Sistema inteligente de control de cadena de frío",
+    "carpeta": "Coleccion_2/13_sistema_inteligente_de_control_de_cadena_de_frio",
+    "modelo": "anomalia"
+  },
+  {
+    "coleccion": 2,
+    "numero": 14,
+    "titulo": "Plataforma de análisis de tráfico vehicular mediante visión artificial",
+    "carpeta": "Coleccion_2/14_plataforma_de_analisis_de_trafico_vehicular_mediante_vision_artif",
+    "modelo": "imagen"
+  },
+  {
+    "coleccion": 2,
+    "numero": 15,
+    "titulo": "Sistema inteligente de clasificación de correos corporativos",
+    "carpeta": "Coleccion_2/15_sistema_inteligente_de_clasificacion_de_correos_corporativos",
+    "modelo": "texto"
+  },
+  {
+    "coleccion": 2,
+    "numero": 16,
+    "titulo": "Plataforma de gestión de laboratorios con predicción de utilización",
+    "carpeta": "Coleccion_2/16_plataforma_de_gestion_de_laboratorios_con_prediccion_de_utilizaci",
+    "modelo": "regresion"
+  },
+  {
+    "coleccion": 2,
+    "numero": 17,
+    "titulo": "Sistema inteligente de inspección visual de productos agrícolas",
+    "carpeta": "Coleccion_2/17_sistema_inteligente_de_inspeccion_visual_de_productos_agricolas",
+    "modelo": "imagen"
+  },
+  {
+    "coleccion": 2,
+    "numero": 18,
+    "titulo": "Plataforma de gestión de voluntariado con asignación inteligente",
+    "carpeta": "Coleccion_2/18_plataforma_de_gestion_de_voluntariado_con_asignacion_inteligente",
+    "modelo": "anomalia"
+  },
+  {
+    "coleccion": 2,
+    "numero": 19,
+    "titulo": "Sistema inteligente de seguimiento de proyectos de construcción",
+    "carpeta": "Coleccion_2/19_sistema_inteligente_de_seguimiento_de_proyectos_de_construccion",
+    "modelo": "anomalia"
+  },
+  {
+    "coleccion": 2,
+    "numero": 20,
+    "titulo": "Plataforma de gestión de centros de cómputo con predicción de capaci",
+    "carpeta": "Coleccion_2/20_plataforma_de_gestion_de_centros_de_computo_con_prediccion_de_cap",
+    "modelo": "regresion"
+  },
+  {
+    "coleccion": 2,
+    "numero": 21,
+    "titulo": "Sistema de clasificación automática de noticias por temática para",
+    "carpeta": "Coleccion_2/21_sistema_de_clasificacion_automatica_de_noticias_por_tematica_para",
+    "modelo": "texto"
+  },
+  {
+    "coleccion": 2,
+    "numero": 22,
+    "titulo": "Plataforma inteligente de gestión de compras empresariales",
+    "carpeta": "Coleccion_2/22_plataforma_inteligente_de_gestion_de_compras_empresariales",
+    "modelo": "anomalia"
+  },
+  {
+    "coleccion": 2,
+    "numero": 23,
+    "titulo": "Sistema de detección de defectos en documentos digitalizados",
+    "carpeta": "Coleccion_2/23_sistema_de_deteccion_de_defectos_en_documentos_digitalizados",
+    "modelo": "texto"
+  },
+  {
+    "coleccion": 2,
+    "numero": 24,
+    "titulo": "Plataforma de gestión de servicios de campo con predicción de duración 78",
+    "carpeta": "Coleccion_2/24_plataforma_de_gestion_de_servicios_de_campo_con_prediccion_de_dur",
+    "modelo": "regresion"
+  }
+]

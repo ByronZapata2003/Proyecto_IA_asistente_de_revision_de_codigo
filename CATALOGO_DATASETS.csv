@@ -1,0 +1,43 @@
+﻿Coleccion,Numero,Proyecto,Dataset,URL,Modo
+1,1,Sistema inteligente de gestión de requisitos,PROMISE requirements datasets,https://zenodo.org/search?q=software%20requirements%20dataset,manual
+1,2,Clasificador inteligente de incidencias de software,GitHub issue datasets,https://www.kaggle.com/datasets?search=github+issues,manual
+1,3,Asistente de revisión de código,CodeSearchNet,https://github.com/github/CodeSearchNet,manual
+1,4,Predicción de defectos de software,NASA software defect datasets,https://www.openml.org/search?type=data&sort=runs&id=1068,manual
+1,5,Sistema de recomendación de tareas para equipos ágiles,Jira issue datasets,https://www.kaggle.com/datasets?search=jira+issues,manual
+1,6,Plataforma de pruebas de software con generación asistida,Defects4J,https://github.com/rjust/defects4j,manual
+1,7,Detector de anomalías en logs de aplicaciones,Loghub,https://github.com/logpai/loghub,manual
+1,8,Sistema inteligente de mesa de ayuda universitaria,Customer support tickets,https://www.kaggle.com/datasets?search=customer+support+tickets,manual
+1,9,Gestor inteligente de proyectos con predicción de retrasos,Software project effort datasets,https://www.openml.org/search?type=data&q=software%20effort,manual
+1,10,Sistema de análisis de sentimiento para calidad de software,IMDB reviews (transferencia de dominio requerida),https://huggingface.co/datasets/stanfordnlp/imdb,manual
+1,11,Plataforma de mantenimiento predictivo de activos TI,NASA turbofan CMAPSS,https://data.nasa.gov/dataset/cmapss-jet-engine-simulated-data,manual
+1,12,Sistema de visión artificial para control de calidad,MVTec AD,https://www.mvtec.com/company/research/datasets/mvtec-ad,manual
+1,13,Gestión inteligente de historias de usuario y estimación,Agile user stories datasets,https://www.kaggle.com/datasets?search=user+stories+agile,manual
+1,14,Plataforma DevSecOps con priorización inteligente,NVD CVE feeds,https://nvd.nist.gov/vuln/data-feeds,manual
+1,15,Sistema de accesibilidad web asistido por IA,WebAIM Million,https://webaim.org/projects/million/,manual
+1,16,Plataforma de detección de fraude académico en entregas de código,BigCloneBench,https://github.com/clonebench/BigCloneBench,manual
+1,17,Sistema inteligente de gestión documental y clasificación,20 Newsgroups (proxy para clasificación documental),https://scikit-learn.org/stable/datasets/real_world.html#the-20-newsgroups-text-dataset,20news
+1,18,Sistema de pronóstico de demanda con arquitectura empresarial,M5 Forecasting,https://www.kaggle.com/competitions/m5-forecasting-accuracy/data,manual
+2,1,Sistema inteligente de gestión de filas y tiempos de espera,Queueing datasets,https://www.kaggle.com/datasets?search=waiting+time+queue,manual
+2,2,Plataforma inteligente de gestión de donaciones y distribución de ayudas 12,Humanitarian Data Exchange,https://data.humdata.org/,manual
+2,3,Sistema de monitoreo inteligente de redes informáticas,CIC IDS 2017,https://www.unb.ca/cic/datasets/ids-2017.html,manual
+2,4,Plataforma de gestión de restaurantes con predicción de demanda,Restaurant visitor forecasting,https://www.kaggle.com/competitions/recruit-restaurant-visitor-forecasting/data,manual
+2,5,Sistema inteligente para gestión de préstamos de equipos universitarios 21,Equipment loan data (no corpus universal),https://www.kaggle.com/datasets?search=equipment+loans,manual
+2,6,Plataforma inteligente de análisis de reuniones,AMI Meeting Corpus,https://groups.inf.ed.ac.uk/ami/corpus/,manual
+2,7,Sistema de gestión de mantenimiento de software con priorización de,Technical debt datasets,https://zenodo.org/search?q=technical%20debt%20dataset,manual
+2,8,Plataforma inteligente para análisis de experiencia del cliente omnicanal 30,Amazon Reviews 2023,https://amazon-reviews-2023.github.io/,manual
+2,9,Sistema de monitoreo de cultivos con predicción de necesidades de riego 33,NASA POWER agroclimate,https://power.larc.nasa.gov/data-access-viewer/,manual
+2,10,Plataforma de gestión de gimnasios con recomendación de actividades 36,Fitness activity datasets,https://www.kaggle.com/datasets?search=fitness+activities,manual
+2,11,Sistema inteligente de análisis de documentos de soporte técnico,Technical support ticket datasets,https://www.kaggle.com/datasets?search=technical+support+tickets,manual
+2,12,Plataforma de administración de condominios con clasificación de,Housing maintenance requests,https://data.cityofnewyork.us/,manual
+2,13,Sistema inteligente de control de cadena de frío,Temperature monitoring datasets,https://www.kaggle.com/datasets?search=cold+chain+temperature,manual
+2,14,Plataforma de análisis de tráfico vehicular mediante visión artificial,UA-DETRAC,https://detrac-db.rit.albany.edu/,manual
+2,15,Sistema inteligente de clasificación de correos corporativos,Enron email dataset,https://www.cs.cmu.edu/~enron/,manual
+2,16,Plataforma de gestión de laboratorios con predicción de utilización,Room occupancy estimation,https://archive.ics.uci.edu/dataset/864/room+occupancy+estimation,manual
+2,17,Sistema inteligente de inspección visual de productos agrícolas,PlantVillage,https://www.tensorflow.org/datasets/catalog/plant_village,manual
+2,18,Plataforma de gestión de voluntariado con asignación inteligente,Volunteer matching datasets,https://www.kaggle.com/datasets?search=volunteer+matching,manual
+2,19,Sistema inteligente de seguimiento de proyectos de construcción,Construction project delay datasets,https://www.kaggle.com/datasets?search=construction+delay,manual
+2,20,Plataforma de gestión de centros de cómputo con predicción de capaci,Google cluster traces,https://github.com/google/cluster-data,manual
+2,21,Sistema de clasificación automática de noticias por temática para,20 Newsgroups,https://scikit-learn.org/stable/datasets/real_world.html#the-20-newsgroups-text-dataset,20news
+2,22,Plataforma inteligente de gestión de compras empresariales,Online Retail II,https://archive.ics.uci.edu/dataset/502/online+retail+ii,manual
+2,23,Sistema de detección de defectos en documentos digitalizados,RVL-CDIP,https://www.cs.cmu.edu/~aharley/rvl-cdip/,manual
+2,24,Plataforma de gestión de servicios de campo con predicción de duración 78,Field service scheduling datasets,https://www.kaggle.com/datasets?search=field+service+duration,manual
