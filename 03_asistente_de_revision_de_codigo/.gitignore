@@ -1,0 +1,9 @@
+.env
+__pycache__/
+.pytest_cache/
+.ipynb_checkpoints/
+models/
+data/
+reconstruccion_frontend.zip
+.env.save
+.DS_Store

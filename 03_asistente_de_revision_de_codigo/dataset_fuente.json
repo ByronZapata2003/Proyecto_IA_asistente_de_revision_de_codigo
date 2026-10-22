@@ -1,7 +1,0 @@
-{
-  "proyecto": "Asistente de revisión de código",
-  "nombre": "CodeSearchNet",
-  "url": "https://github.com/github/CodeSearchNet",
-  "modo": "manual",
-  "nota": "Fuente candidata para investigación académica; comprobar pertinencia, licencia, formato, disponibilidad y esquema. No se integra automáticamente al modelo base."
-}
