@@ -18,9 +18,33 @@ def test_upload_rejects_corrupt_image():
     assert r.status_code==422
 
 def test_missing_key_is_actionable(monkeypatch):
+    monkeypatch.setenv('AI_PROVIDER','openai')
     monkeypatch.delenv('OPENAI_API_KEY',raising=False)
     r=client.post('/projects',files={'file':('x.png',png(),'image/png')})
     assert r.status_code==503 and 'OPENAI_API_KEY' in r.json()['detail']
+
+def test_gemini_missing_key_is_actionable(monkeypatch):
+    monkeypatch.setenv('AI_PROVIDER','gemini')
+    monkeypatch.delenv('GEMINI_API_KEY',raising=False)
+    r=client.post('/projects',files={'file':('x.png',png(),'image/png')})
+    assert r.status_code==503 and 'GEMINI_API_KEY' in r.json()['detail']
+
+def test_gemini_generates_structured_frontend(monkeypatch):
+    import json
+    class Response:
+        ok=True
+        status_code=200
+        def json(self):
+            result={'html':'<main>Hola</main>','css':'main{}','javascript':''}
+            return {'candidates':[{'content':{'parts':[{'text':json.dumps(result)}]}}]}
+    monkeypatch.setenv('AI_PROVIDER','gemini')
+    monkeypatch.setenv('GEMINI_API_KEY','test-only')
+    monkeypatch.setenv('GEMINI_MODEL','gemini-3.5-flash-lite')
+    monkeypatch.setattr(api.requests,'post',lambda *args,**kwargs:Response())
+    result=api.generate(Image.open(io.BytesIO(png())))
+    assert result['provider']=='Gemini'
+    assert result['model']=='gemini-3.5-flash-lite'
+    assert result['html']=='<main>Hola</main>'
 
 def test_generate_and_save(monkeypatch):
     class Insert: inserted_id='abc123'

@@ -24,6 +24,12 @@ load_dotenv(ROOT / ".env")
 MAX_IMAGE_BYTES = int(os.getenv("MAX_IMAGE_MB", "10")) * 1024 * 1024
 ALLOWED_TYPES = {"image/png", "image/jpeg", "image/webp"}
 ALLOWED_FORMATS = {"PNG", "JPEG", "WEBP"}
+GENERATION_PROMPT = (
+    "Reconstruye la apariencia visible de esta captura como una página frontend independiente. "
+    "Devuelve exclusivamente JSON válido con claves html, css y javascript. "
+    "HTML fragmento semántico, CSS completo y responsive; javascript vacío salvo interacciones "
+    "visibles necesarias. No uses recursos remotos si puedes evitarlos. La captura no revela el código original."
+)
 app = FastAPI(title="Reconstrucción visual de páginas", version="1.0.0")
 
 
@@ -109,39 +115,97 @@ def capture_url(url: str) -> bytes:
         raise HTTPException(422, f"No se pudo capturar la URL ({type(exc).__name__}). Puede requerir inicio de sesión, bloquear automatización o depender de contenido dinámico.")
 
 
+def _parse_generated_json(raw: str, provider: str, model: str):
+    raw = raw.strip()
+    if raw.startswith("```"):
+        raw = raw.strip("`")
+        if raw.startswith("json"):
+            raw = raw[4:]
+    result = json.loads(raw)
+    if not isinstance(result, dict) or not all(isinstance(result.get(k), str) for k in ("html", "css")):
+        raise ValueError("Respuesta incompleta")
+    js = result.get("javascript", "")
+    if not isinstance(js, str) or any(len(result.get(k, "")) > 500_000 for k in ("html", "css", "javascript")):
+        raise ValueError("Respuesta fuera de límites")
+    return {"html": result["html"], "css": result["css"], "javascript": js, "provider": provider, "model": model}
+
+
 def generate(image: Image.Image):
+    provider = os.getenv("AI_PROVIDER", "openai").strip().lower()
+    buf = io.BytesIO()
+    image.save(buf, format="PNG")
+    image_bytes = buf.getvalue()
+    encoded = base64.b64encode(image_bytes).decode("ascii")
+
+    if provider == "gemini":
+        key = os.getenv("GEMINI_API_KEY", "").strip()
+        model = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite").strip()
+        if not key:
+            raise HTTPException(503, "Falta GEMINI_API_KEY. Crea una clave en Google AI Studio, agrégala al .env y reinicia la API.")
+        base = os.getenv("GEMINI_API_BASE_URL", "https://generativelanguage.googleapis.com/v1beta").rstrip("/")
+        endpoint = f"{base}/models/{model}:generateContent"
+        body = {
+            "contents": [{"parts": [
+                {"text": GENERATION_PROMPT},
+                {"inline_data": {"mime_type": "image/png", "data": encoded}},
+            ]}],
+            "generationConfig": {
+                "responseMimeType": "application/json",
+                "responseSchema": {
+                    "type": "OBJECT",
+                    "properties": {"html": {"type": "STRING"}, "css": {"type": "STRING"}, "javascript": {"type": "STRING"}},
+                    "required": ["html", "css", "javascript"],
+                },
+                "temperature": 0.2,
+                "maxOutputTokens": 8192,
+            },
+        }
+        try:
+            response = requests.post(endpoint, headers={"x-goog-api-key": key}, json=body, timeout=(10, 120))
+            if not response.ok:
+                try:
+                    detail = response.json().get("error", {}).get("message", "")
+                except (ValueError, AttributeError):
+                    detail = ""
+                suffix = f" Detalle del proveedor: {detail[:400]}" if detail else ""
+                status = 429 if response.status_code == 429 else 502
+                raise HTTPException(status, f"Gemini respondió HTTP {response.status_code}.{suffix} Revisa el modelo, el estado del proyecto y la cuota gratuita en Google AI Studio.")
+            payload = response.json()
+            parts = payload.get("candidates", [{}])[0].get("content", {}).get("parts", [])
+            raw = "".join(part.get("text", "") for part in parts if isinstance(part, dict))
+            if not raw:
+                raise ValueError("Gemini devolvió una respuesta vacía o bloqueada.")
+            return _parse_generated_json(raw, "Gemini", model)
+        except HTTPException:
+            raise
+        except requests.Timeout:
+            raise HTTPException(504, "Gemini tardó demasiado. Inténtalo de nuevo con una captura más pequeña.")
+        except requests.RequestException as exc:
+            raise HTTPException(502, f"No se pudo conectar con Gemini ({type(exc).__name__}). Revisa tu conexión.")
+        except (ValueError, IndexError, KeyError, TypeError) as exc:
+            raise HTTPException(502, f"Gemini no devolvió el JSON esperado ({type(exc).__name__}). Prueba con otra captura o modelo.")
+
+    if provider != "openai":
+        raise HTTPException(503, "AI_PROVIDER debe ser 'openai' o 'gemini'. Revisa el .env y reinicia la API.")
     key = os.getenv("OPENAI_API_KEY", "").strip()
     model = os.getenv("OPENAI_MODEL", "gpt-4.1-mini").strip()
     if not key:
-        raise HTTPException(503, "Falta OPENAI_API_KEY. Copia .env.example a .env, agrega una clave válida de OpenAI y reinicia la API.")
+        raise HTTPException(503, "Falta OPENAI_API_KEY. Configúrala en .env o cambia AI_PROVIDER=gemini y configura GEMINI_API_KEY.")
     try:
         from openai import OpenAI
-        buf = io.BytesIO()
-        image.save(buf, format="PNG")
-        encoded = base64.b64encode(buf.getvalue()).decode("ascii")
         client = OpenAI(api_key=key, timeout=90, max_retries=1)
         response = client.responses.create(
             model=model,
             input=[{"role": "user", "content": [
-                {"type": "input_text", "text": "Reconstruye la apariencia visible de esta captura como una página frontend independiente. Devuelve exclusivamente JSON válido con claves html, css y javascript. HTML fragmento semántico, CSS completo y responsive; javascript vacío salvo interacciones visibles necesarias. No uses recursos remotos si puedes evitarlos. La captura no revela el código original."},
+                {"type": "input_text", "text": GENERATION_PROMPT},
                 {"type": "input_image", "image_url": f"data:image/png;base64,{encoded}", "detail": "high"},
             ]}],
         )
-        raw = response.output_text.strip()
-        if raw.startswith("```"):
-            raw = raw.strip("`")
-            if raw.startswith("json"): raw = raw[4:]
-        result = json.loads(raw)
-        if not isinstance(result, dict) or not all(isinstance(result.get(k), str) for k in ("html", "css")):
-            raise ValueError("Respuesta incompleta")
-        js = result.get("javascript", "")
-        if not isinstance(js, str) or any(len(result.get(k, "")) > 500_000 for k in ("html", "css", "javascript")):
-            raise ValueError("Respuesta fuera de límites")
-        return {"html": result["html"], "css": result["css"], "javascript": js, "provider": "OpenAI", "model": model}
+        return _parse_generated_json(response.output_text, "OpenAI", model)
     except HTTPException:
         raise
     except Exception as exc:
-        raise HTTPException(502, f"El proveedor no pudo generar código ({type(exc).__name__}). Verifica OPENAI_API_KEY, OPENAI_MODEL, conexión y cuota; revisa los registros de la API para más detalle.")
+        raise HTTPException(502, f"OpenAI no pudo generar el código ({type(exc).__name__}). Revisa OPENAI_API_KEY, OPENAI_MODEL, conexión y cuota.")
 
 
 def create_project(data: bytes, source: str):
@@ -160,7 +224,10 @@ def create_project(data: bytes, source: str):
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "provider_configured": bool(os.getenv("OPENAI_API_KEY")), "model": os.getenv("OPENAI_MODEL", "gpt-4.1-mini")}
+    provider = os.getenv("AI_PROVIDER", "openai").strip().lower()
+    model = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite") if provider == "gemini" else os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
+    configured = bool(os.getenv("GEMINI_API_KEY")) if provider == "gemini" else bool(os.getenv("OPENAI_API_KEY"))
+    return {"status": "ok", "provider": provider, "provider_configured": configured, "model": model}
 
 
 @app.post("/projects", response_model=ProjectOut)

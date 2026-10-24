@@ -1,13 +1,13 @@
 # Reconstrucción frontend desde una captura
 
-Aplicación educativa que recibe una captura JPG, PNG o WEBP (o captura una URL pública) y usa un modelo de visión de OpenAI para proponer HTML y CSS, más JavaScript cuando hace falta. **No es el asistente original de revisión de código**: el proyecto inicial contenía un modelo demostrativo basado en datos sintéticos, sin generación visual. Esa implementación no se presenta como si ya hiciera reconstrucción de interfaces; se retiró del flujo principal.
+Aplicación educativa que recibe una captura JPG, PNG o WEBP (o captura una URL pública) y usa un modelo de visión de Gemini u OpenAI para proponer HTML y CSS, más JavaScript cuando hace falta. Gemini queda como proveedor de ejemplo para probar el nivel gratuito si está disponible para tu proyecto. **No es el asistente original de revisión de código**: el proyecto inicial contenía un modelo demostrativo basado en datos sintéticos, sin generación visual. Esa implementación no se presenta como si ya hiciera reconstrucción de interfaces; se retiró del flujo principal.
 
 La imagen no revela el código fuente original. El resultado es una aproximación visual: puede diferir en tipografías, interacciones, diseño adaptable, recursos y elementos que no aparecen en la captura. El producto no afirma entrenar ningún modelo.
 
 ## Arquitectura
 
 - **Streamlit**: carga de imagen/URL, comparación, código, descarga ZIP y gestión de proyectos.
-- **FastAPI**: validación, captura con Playwright, llamada a OpenAI Responses API y endpoints de proyectos.
+- **FastAPI**: validación, captura con Playwright, llamada a Gemini `generateContent` u OpenAI Responses API y endpoints de proyectos.
 - **MongoDB local**: documentos en `web_screenshot_builder.projects`; se guarda fecha, origen, proveedor/modelo y código. No se guardan claves API ni la imagen original.
 - **Vista previa**: documento generado dentro de un `iframe` con `sandbox="allow-scripts"` y origen opaco. El backend nunca ejecuta código generado.
 
@@ -25,7 +25,7 @@ python -m playwright install chromium
 cp .env.example .env
 ```
 
-3. Edita `.env` y configura `OPENAI_API_KEY` con una clave propia, `OPENAI_MODEL` con un modelo de visión disponible en tu cuenta y, si corresponde, `MONGO_URI`, `MONGO_DB` y `API_URL`. No pegues la clave en el notebook ni la subas al repositorio. El proveedor/modelo puede variar según acceso y cambios del servicio; el valor inicial es `gpt-4.1-mini`.
+3. Para probar Gemini, crea una clave en [Google AI Studio](https://aistudio.google.com/app/apikey), y configura en `.env` `AI_PROVIDER=gemini`, `GEMINI_API_KEY` y `GEMINI_MODEL=gemini-3.5-flash-lite`. La API de Gemini ofrece un nivel gratuito para ciertos modelos y cuentas elegibles, con cuotas que pueden cambiar; confirma que el proyecto esté en el nivel gratuito en AI Studio. En ese nivel Google puede usar el contenido enviado para mejorar sus productos, así que evita capturas sensibles. Si prefieres OpenAI, usa `AI_PROVIDER=openai`, `OPENAI_API_KEY` y `OPENAI_MODEL`. No pegues claves en el notebook ni las subas al repositorio. También configura `MONGO_URI`, `MONGO_DB` y `API_URL` si necesitas cambiar los valores locales.
 4. Inicia MongoDB localmente. Si instalaste Homebrew:
 
 ```bash
@@ -59,6 +59,8 @@ streamlit run frontend/app.py
 ```
 
 Abre `http://localhost:8501`. La API está en `http://127.0.0.1:8000/docs`; `/health` muestra si hay clave configurada (nunca su valor). Los errores de API, proveedor o MongoDB indican el siguiente paso esperado.
+
+Para cambiar proveedor, edita `AI_PROVIDER` y la clave/modelo correspondientes en `.env`, guarda y reinicia FastAPI. Para una prueba sin cargo, asegúrate de que `GEMINI_API_KEY` pertenezca a un proyecto de AI Studio elegible para el nivel gratuito; las cuotas y los modelos habilitados dependen de Google y pueden variar. El uso por encima del nivel gratuito puede generar cargos si el proyecto está vinculado a facturación.
 
 ### Captura de URL
 
