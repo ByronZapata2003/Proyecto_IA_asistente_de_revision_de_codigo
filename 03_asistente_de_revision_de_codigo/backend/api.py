@@ -28,7 +28,8 @@ GENERATION_PROMPT = (
     "Reconstruye la apariencia visible de esta captura como una página frontend independiente. "
     "Devuelve exclusivamente JSON válido con claves html, css y javascript. "
     "HTML fragmento semántico, CSS completo y responsive; javascript vacío salvo interacciones "
-    "visibles necesarias. No uses recursos remotos si puedes evitarlos. La captura no revela el código original."
+    "visibles necesarias. Entrega cada archivo con saltos de línea e indentación legible; no minifiques. "
+    "No uses recursos remotos si puedes evitarlos. La captura no revela el código original."
 )
 app = FastAPI(title="Reconstrucción visual de páginas", version="1.0.0")
 

@@ -73,7 +73,13 @@ with tab_new:
             components.html('<iframe sandbox="allow-scripts" referrerpolicy="no-referrer" style="width:100%;height:650px;border:1px solid #ddd" srcdoc="' + html.escape(html_doc, quote=True) + '"></iframe>', height=670, scrolling=True)
         files = st.tabs(["HTML", "CSS", "JavaScript"])
         for t, key in zip(files, ["html", "css", "javascript"]):
-            with t: st.code(project.get(key, "") or "(vacío)", language={"html":"html","css":"css","javascript":"javascript"}[key])
+            with t:
+                st.code(
+                    project.get(key, "") or "(vacío)",
+                    language={"html": "html", "css": "css", "javascript": "javascript"}[key],
+                    line_numbers=True,
+                    wrap_lines=True,
+                )
         st.download_button("Descargar archivos (.zip)", bundle(project), file_name="reconstruccion_frontend.zip", mime="application/zip")
 with tab_projects:
     if st.button("Actualizar proyectos"):
