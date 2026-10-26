@@ -58,6 +58,27 @@ def test_generate_and_save(monkeypatch):
     assert r.status_code==200 and r.json()['id']=='abc123'
     assert col.doc['source']=='x.png' and col.doc['html']=='<main>Hi</main>'
 
+def test_url_generation_returns_preview_and_code(monkeypatch):
+    from bson import ObjectId
+    class Insert:
+        inserted_id=ObjectId()
+    class Collection:
+        def insert_one(self, doc):
+            doc['_id']=Insert.inserted_id
+            return Insert()
+    col=Collection()
+    image=png()
+    monkeypatch.setattr(api,'capture_url',lambda url:image)
+    monkeypatch.setattr(api,'get_collection',lambda:col)
+    monkeypatch.setattr(api,'generate',lambda image:{'html':'<main>URL</main>','css':'main{}','javascript':'','provider':'Gemini','model':'fake'})
+    r=client.post('/projects/from-url',json={'url':'https://example.com'})
+    assert r.status_code==200
+    payload=r.json()
+    assert payload['html']=='<main>URL</main>'
+    assert payload['css']=='main{}'
+    assert payload['preview_image']
+    assert payload['id']==str(Insert.inserted_id)
+
 def test_projects_limit_validation():
     assert client.get('/projects?limit=0').status_code==422
 

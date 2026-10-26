@@ -245,6 +245,9 @@ def create_from_url(payload: URLRequest):
     url = str(payload.url)
     data = capture_url(url)
     project = create_project(data, url)
+    # PyMongo adds an ObjectId to the inserted document, which JSONResponse
+    # cannot serialize. The public API exposes the string `id` instead.
+    project.pop("_id", None)
     project["preview_image"] = base64.b64encode(data).decode("ascii")
     return JSONResponse(content=project)
 
