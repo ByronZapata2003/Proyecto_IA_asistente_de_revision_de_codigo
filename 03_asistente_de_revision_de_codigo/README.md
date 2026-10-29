@@ -2,7 +2,7 @@
 
 Aplicación educativa que recibe una captura JPG, PNG o WEBP (o captura una URL pública) y usa un modelo de visión de Gemini u OpenAI para proponer HTML y CSS, más JavaScript cuando hace falta. Gemini queda como proveedor de ejemplo para probar el nivel gratuito si está disponible para tu proyecto. **No es el asistente original de revisión de código**: el proyecto inicial contenía un modelo demostrativo basado en datos sintéticos, sin generación visual. Esa implementación no se presenta como si ya hiciera reconstrucción de interfaces; se retiró del flujo principal.
 
-La imagen no revela el código fuente original. El resultado es una aproximación visual: puede diferir en tipografías, interacciones, diseño adaptable, recursos y elementos que no aparecen en la captura. El producto no afirma entrenar ningún modelo.
+La imagen no revela el código fuente original. El resultado es una aproximación visual: puede diferir en tipografías, interacciones, diseño adaptable, recursos y elementos que no aparecen en la captura. El índice opcional de referencias aprende similitudes visuales; no ajusta los pesos de ningún modelo generativo.
 
 ## Arquitectura
 
@@ -10,6 +10,19 @@ La imagen no revela el código fuente original. El resultado es una aproximació
 - **FastAPI**: validación, captura con Playwright, llamada a Gemini `generateContent` u OpenAI Responses API y endpoints de proyectos.
 - **MongoDB local**: documentos en `web_screenshot_builder.projects`; se guarda fecha, origen, proveedor/modelo y código. No se guardan claves API ni la imagen original.
 - **Vista previa**: documento generado dentro de un `iframe` con `sandbox="allow-scripts"` y origen opaco. El backend nunca ejecuta código generado.
+
+## Referencias opcionales de WebSight
+
+La app puede usar un índice visual k-NN de pares de captura/HTML de [HuggingFaceM4/WebSight](https://huggingface.co/datasets/HuggingFaceM4/WebSight) para añadir ejemplos estructurales al contexto del proveedor. Esto es recuperación de ejemplos, no ajuste fino de Gemini ni OpenAI. Sin el índice entrenado, la reconstrucción funciona directamente con la imagen.
+
+Desde esta carpeta y con el entorno Conda activado, descarga una muestra limitada y crea el índice local:
+
+```bash
+python -c "from descargar_dataset import download_dataset; print(download_dataset(max_samples=128))"
+python -c "from backend.ml import train; model = train(); print('Índice entrenado con', len(model['examples']), 'pares')"
+```
+
+La primera descarga puede transferir un shard remoto grande aunque se guarde una muestra pequeña. El dataset tiene licencia CC BY 4.0; conserva la atribución si distribuyes el modelo o la aplicación. El índice se guarda localmente en `models/` y no debe subirse al repositorio.
 
 ## Requisitos en macOS
 
@@ -88,7 +101,7 @@ Con el entorno activo, desde la raíz:
 python -m pytest -q
 ```
 
-Las pruebas cubren formatos/imágenes inválidas, falta de clave, límite de consulta y guardado de una respuesta simulada. No hacen llamadas pagadas al proveedor ni requieren un servidor MongoDB.
+Las pruebas cubren formatos/imágenes inválidas, falta de clave, límite de consulta, guardado y respuesta de URL con vista previa, y entrenamiento/recuperación con muestras simuladas. No hacen llamadas pagadas al proveedor, descargan datasets ni requieren un servidor MongoDB.
 
 ## Configuración y límites
 

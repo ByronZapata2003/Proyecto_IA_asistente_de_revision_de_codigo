@@ -63,6 +63,11 @@ with tab_new:
     project = st.session_state.get("project")
     if project:
         st.success(f"Proyecto {project['id']} guardado · {project['provider']} / {project['model']}")
+        used_examples = project.get("dataset_examples", 0)
+        if used_examples:
+            st.caption(f"Generación contextualizada con {used_examples} referencia(s) del dataset WebSight.")
+        else:
+            st.caption("Para usar referencias del dataset, ejecuta el entrenamiento del notebook.")
         left, right = st.columns(2)
         with left:
             st.subheader("Captura original")
