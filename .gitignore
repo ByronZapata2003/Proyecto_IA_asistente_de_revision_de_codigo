@@ -1,0 +1,9 @@
+# Archivos temporales de macOS, Python y Jupyter
+.DS_Store
+**/.DS_Store
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+**/.pytest_cache/
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
