@@ -1,8 +1,8 @@
 {
-  "titulo": "Asistente de revisión de código",
+  "titulo": "Reconstrucción de frontend desde capturas",
   "coleccion": 1,
   "numero": 3,
-  "db": "ia_c1_p03",
-  "tipo_modelo": "imagen",
+  "db": "web_screenshot_builder",
+  "tipo_modelo": "recuperacion_visual",
   "docente": "Julian Rene Muñoz Burbano"
 }

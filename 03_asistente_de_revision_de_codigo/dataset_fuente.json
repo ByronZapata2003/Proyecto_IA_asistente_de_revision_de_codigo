@@ -1,7 +1,11 @@
 {
-  "proyecto": "Asistente de revisión de código",
-  "nombre": "CodeSearchNet",
-  "url": "https://github.com/github/CodeSearchNet",
-  "modo": "manual",
-  "nota": "Fuente candidata para investigación académica; comprobar pertinencia, licencia, formato, disponibilidad y esquema. No se integra automáticamente al modelo base."
+  "proyecto": "Reconstrucción de frontend desde capturas",
+  "nombre": "HuggingFaceM4/WebSight",
+  "repo": "HuggingFaceM4/WebSight",
+  "configuracion": "v0.2",
+  "split": "train",
+  "url": "https://huggingface.co/datasets/HuggingFaceM4/WebSight",
+  "licencia": "CC-BY-4.0",
+  "modo": "streaming",
+  "nota": "Dataset sintético de capturas y HTML con Tailwind. El descargador toma una muestra acotada en streaming. Revisar la ficha y atribuir el dataset al distribuir el modelo o la aplicación."
 }

@@ -1,40 +1,94 @@
-import joblib
+"""Índice visual k-NN entrenado con pares de capturas y HTML de WebSight."""
+
+import json
 from pathlib import Path
+
+import joblib
 import numpy as np
-from sklearn.pipeline import make_pipeline
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression, Ridge
-from sklearn.ensemble import IsolationForest
-from sklearn.preprocessing import StandardScaler
+from PIL import Image
+from sklearn.neighbors import NearestNeighbors
 
-ART=Path(__file__).resolve().parents[1]/'models'/'modelo.joblib'
-KIND=__import__('json').loads((Path(__file__).resolve().parents[1]/'config.json').read_text(encoding='utf8'))['tipo_modelo']
+ROOT = Path(__file__).resolve().parents[1]
+DATA_DIR = ROOT / "data" / "processed"
+ARTIFACT = ROOT / "models" / "modelo.joblib"
+IMAGE_SIZE = (32, 32)
 
-def train():
-    ART.parent.mkdir(exist_ok=True)
-    if KIND=='texto':
-        texts=['error al iniciar sistema','fallo critico en produccion','incidencia de seguridad','servicio no disponible','solicitud de informacion','consulta de usuario','mejora de interfaz','peticion de nueva funcion']
-        y=[1,1,1,1,0,0,0,0]
-        m=make_pipeline(TfidfVectorizer(ngram_range=(1,2)),LogisticRegression(max_iter=1000))
-        m.fit(texts,y)
-    elif KIND=='regresion':
-        rng=np.random.default_rng(42);X=rng.uniform(0,100,(160,3));y=2*X[:,0]+.5*X[:,1]-.2*X[:,2]+rng.normal(0,5,160)
-        m=make_pipeline(StandardScaler(),Ridge());m.fit(X,y)
-    else:
-        rng=np.random.default_rng(42);X=rng.normal(0,1,(160,3));m=IsolationForest(random_state=42,contamination=.1);m.fit(X)
-    joblib.dump(m,ART)
-    return m
 
-def predict(payload):
-    m=joblib.load(ART) if ART.exists() else train()
-    if KIND=='texto':
-        v=str(payload.get('texto','')).strip()
-        if not v:raise ValueError('Se requiere texto')
-        result=int(m.predict([v])[0]);return {'prediccion':result,'etiqueta':'prioridad alta' if result else 'prioridad normal','nota':'Clasificador didactico con datos sinteticos'}
-    vals=payload.get('valores',[])
-    if not isinstance(vals,list) or len(vals)!=3:raise ValueError('Se requieren exactamente 3 valores numericos')
-    try:x=np.asarray([vals],dtype=float)
-    except (ValueError,TypeError):raise ValueError('Valores no numericos')
-    if not np.isfinite(x).all():raise ValueError('Valores deben ser finitos')
-    y=m.predict(x)[0]
-    return {'prediccion':float(y) if KIND=='regresion' else int(y),'etiqueta':'estimacion' if KIND=='regresion' else ('normal' if y==1 else 'anomalia'),'nota':'Modelo demostrativo entrenado con datos sinteticos; no validado para produccion'}
+def image_features(image):
+    """Convierte una imagen PIL o una ruta a un vector RGB reproducible."""
+    if isinstance(image, (str, Path)):
+        with Image.open(image) as opened:
+            image = opened.copy()
+    if not isinstance(image, Image.Image):
+        raise TypeError("La entrada debe ser una imagen PIL o una ruta de imagen.")
+    thumbnail = image.convert("RGB").resize(IMAGE_SIZE, Image.Resampling.BILINEAR)
+    return np.asarray(thumbnail, dtype=np.float32).reshape(1, -1) / 255.0
+
+
+def train(dataset_dir=DATA_DIR, artifact_path=ARTIFACT):
+    """Ajusta un índice de vecinos sobre `examples.jsonl` y persiste el artefacto."""
+    dataset_dir = Path(dataset_dir)
+    manifest = dataset_dir / "examples.jsonl"
+    if not manifest.is_file():
+        raise FileNotFoundError(
+            f"No existe {manifest}. Ejecuta descargar_dataset.py o la celda de descarga del notebook."
+        )
+
+    features, examples = [], []
+    for line_number, line in enumerate(manifest.read_text(encoding="utf-8").splitlines(), start=1):
+        if not line.strip():
+            continue
+        row = json.loads(line)
+        image_name = row.get("image", "")
+        html = row.get("html", "")
+        image_path = dataset_dir / image_name
+        if not image_path.is_file() or not isinstance(html, str) or not html.strip():
+            continue
+        try:
+            features.append(image_features(image_path)[0])
+        except (OSError, ValueError, TypeError) as exc:
+            print(f"Omitiendo fila {line_number}: {type(exc).__name__}")
+            continue
+        examples.append(
+            {
+                "html": html[:200_000],
+                "description": str(row.get("description", ""))[:1000],
+                "image": image_name,
+            }
+        )
+
+    if not examples:
+        raise ValueError("El dataset no contiene pares válidos de imagen y HTML.")
+
+    matrix = np.stack(features)
+    index = NearestNeighbors(metric="cosine", algorithm="brute")
+    index.fit(matrix)
+    model = {
+        "index": index,
+        "features": matrix,
+        "examples": examples,
+        "image_size": IMAGE_SIZE,
+        "dataset": "HuggingFaceM4/WebSight v0.2",
+    }
+    artifact_path = Path(artifact_path)
+    artifact_path.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(model, artifact_path)
+    return model
+
+
+def is_trained(artifact_path=ARTIFACT):
+    return Path(artifact_path).is_file()
+
+
+def retrieve_examples(image, limit=2, artifact_path=ARTIFACT):
+    """Busca pares visualmente cercanos para usarlos como generación contextual."""
+    artifact_path = Path(artifact_path)
+    if not artifact_path.is_file():
+        return []
+    model = joblib.load(artifact_path)
+    count = min(max(int(limit), 1), len(model["examples"]))
+    distances, indices = model["index"].kneighbors(image_features(image), n_neighbors=count)
+    results = []
+    for distance, index in zip(distances[0], indices[0]):
+        results.append({**model["examples"][int(index)], "distance": float(distance)})
+    return results
