@@ -22,6 +22,11 @@ def explain_error(exc):
     if isinstance(exc, requests.HTTPError):
         try: st.error(exc.response.json().get("detail", str(exc)))
         except Exception: st.error(str(exc))
+    elif isinstance(exc, requests.Timeout):
+        st.warning(
+            "La solicitud tardó más de lo esperado. La API podría seguir procesándola y guardar el proyecto; "
+            "revisa Proyectos guardados antes de volver a enviarla."
+        )
     else:
         st.error(f"No se pudo conectar con la API en {API}. Inicia FastAPI y revisa API_URL. Detalle: {exc}")
 
@@ -54,7 +59,8 @@ with tab_new:
         if st.button("Capturar y generar", type="primary", disabled=not url.strip()):
             try:
                 with st.spinner("Capturando la página y generando archivos…"):
-                    resp = requests.post(API + "/projects/from-url", json={"url": url.strip()}, timeout=150)
+                    # URL capture and vision generation are sequential and can exceed 150 seconds.
+                    resp = requests.post(API + "/projects/from-url", json={"url": url.strip()}, timeout=300)
                     resp.raise_for_status(); p = resp.json(); st.session_state["project"] = p
                     import base64
                     st.session_state["original"] = base64.b64decode(p.pop("preview_image")) if p.get("preview_image") else None
