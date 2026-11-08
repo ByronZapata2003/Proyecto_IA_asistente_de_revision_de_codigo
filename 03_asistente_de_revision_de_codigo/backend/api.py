@@ -49,37 +49,52 @@ class ProjectOut(BaseModel):
     css: str
     javascript: str = ""
     dataset_examples: int = 0
+    arbol_estructura: str = ""
 
 
-def generar_arbol_ascii(nombre_raiz: str, estructura: dict) -> str:
+def generar_arbol_dinamico(num_proyecto: int, html_code: str, css_code: str, js_code: str) -> str:
     """
-    Convierte una estructura de diccionario en formato de árbol ASCII.
-    Ejemplo de formato de entrada:
-    {
-        "index.html": None,
-        "Styles": {"style.css": None},
-        "Scripts": {"main.js": None, "util.js": None}
-    }
+    Construye dinámicamente el árbol ASCII basado únicamente en los archivos
+    que realmente contienen código generado (Proyecto_1, Proyecto_2, etc.).
     """
+    nombre_raiz = f"Proyecto_{num_proyecto}"
+    estructura = {}
+
+    # 1. Siempre incluye index.html si hay HTML
+    if html_code and html_code.strip():
+        estructura["index.html"] = None
+
+    # 2. Si hay CSS, agrega la carpeta Styles con style.css
+    if css_code and css_code.strip():
+        estructura["Styles"] = {"style.css": None}
+
+    # 3. Solo si hay JavaScript válido, agrega la carpeta Scripts
+    if js_code and js_code.strip() and js_code.strip() != "(vacío)":
+        estructura["Scripts"] = {"main.js": None}
+
+    if not estructura:
+        estructura["index.html"] = None
+
     lineas = [f"{nombre_raiz}/", "│"]
-    
-    def _construir(nodo, prefijo=""):
-        elementos = list(nodo.keys())
-        total = len(elementos)
-        for i, nombre in enumerate(elementos):
-            es_ultimo = (i == total - 1)
-            conector = "└── " if es_ultimo else "├── "
-            hijo = nodo[nombre]
-            
-            if isinstance(hijo, dict):  # Es una carpeta
-                lineas.append(f"{prefijo}{conector}{nombre}/")
-                nuevo_prefijo = prefijo + ("    " if es_ultimo else "│   ")
-                _construir(hijo, nuevo_prefijo)
-            else:  # Es un archivo
-                lineas.append(f"{prefijo}{conector}{nombre}")
-                
-    _construir(estructura)
+    elementos = list(estructura.keys())
+    total = len(elementos)
+
+    for i, nombre in enumerate(elementos):
+        es_ultimo = (i == total - 1)
+        conector = "└── " if es_ultimo else "├── "
+        hijo = estructura[nombre]
+
+        if isinstance(hijo, dict):  # Carpeta (Styles o Scripts)
+            lineas.append(f"{conector}{nombre}/")
+            sub_elementos = list(hijo.keys())
+            for sub_nom in sub_elementos:
+                indent = "    " if es_ultimo else "│   "
+                lineas.append(f"{indent}└── {sub_nom}")
+        else:  # Archivo en raíz (index.html)
+            lineas.append(f"{conector}{nombre}")
+
     return "\n".join(lineas)
+
 
 def get_collection():
     uri = os.getenv("MONGO_URI", "mongodb://127.0.0.1:27017")
@@ -167,7 +182,6 @@ def _parse_generated_json(raw: str, provider: str, model: str, dataset_examples:
 
 
 def rate_limit_detail(exc: Exception) -> str:
-    """Explain OpenAI 429 responses without exposing credentials or prompts."""
     body = getattr(exc, "body", None)
     error = body.get("error", body) if isinstance(body, dict) else {}
     code = getattr(exc, "code", None)
@@ -216,7 +230,7 @@ def generate(image: Image.Image):
         model = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite").strip()
         if not key:
             raise HTTPException(503, "Falta GEMINI_API_KEY. Crea una clave en Google AI Studio, agrégala al .env y reinicia la API.")
-        base = os.getenv("GEMINI_API_BASE_URL", "https://generativelanguage.googleapis.com/v1beta").rstrip("/")
+        base = os.getenv("GEMINI_API_BASE_URL", "[https://generativelanguage.googleapis.com/v1beta](https://generativelanguage.googleapis.com/v1beta)").rstrip("/")
         endpoint = f"{base}/models/{model}:generateContent"
         body = {
             "contents": [{"parts": [
@@ -293,7 +307,29 @@ def create_project(data: bytes, source: str):
     image = validate_image(data, "image/png")
     result = generate(image)
     created_at = datetime.now(timezone.utc)
-    doc = {"created_at": created_at, "source": source, **result}
+    
+    # Determina el número correlativo del proyecto en la base de datos
+    try:
+        total_existentes = get_collection().count_documents({})
+        num_proyecto = total_existentes + 1
+    except Exception:
+        num_proyecto = 1
+
+    # Construcción dinámica del árbol basada en el resultado de la IA
+    arbol_txt = generar_arbol_dinamico(
+        num_proyecto=num_proyecto,
+        html_code=result.get("html", ""),
+        css_code=result.get("css", ""),
+        js_code=result.get("javascript", "")
+    )
+
+    doc = {
+        "created_at": created_at,
+        "source": source,
+        "arbol_estructura": arbol_txt,
+        **result
+    }
+    
     try:
         saved = get_collection().insert_one(doc)
         doc["id"] = str(saved.inserted_id)
@@ -328,8 +364,6 @@ def create_from_url(payload: URLRequest):
     url = str(payload.url)
     data = capture_url(url)
     project = create_project(data, url)
-    # PyMongo adds an ObjectId to the inserted document, which JSONResponse
-    # cannot serialize. The public API exposes the string `id` instead.
     project.pop("_id", None)
     project["preview_image"] = base64.b64encode(data).decode("ascii")
     return JSONResponse(content=project)
@@ -365,31 +399,3 @@ def delete_project(project_id: str):
     except PyMongoError: raise HTTPException(503, "MongoDB no disponible.")
     if not result.deleted_count: raise HTTPException(404, "No existe ese proyecto.")
     return {"deleted": True, "id": project_id}
-
-
-@app.post("/predict")  # o el nombre que tenga tu ruta/endpoint
-async def predict(file: UploadFile = File(...)):
-    # ... tu código de procesamiento actual con el modelo/k-NN ...
-
-    # 1. Definir o recuperar la estructura de carpetas que devolvió el modelo/sistema
-    estructura = {
-        "index.html": None,
-        "Styles": {
-            "style.css": None
-        },
-        "Scripts": {
-            "util.js": None,
-            "Destino.js": None,
-            "Registro.js": None,
-            "main.js": None
-        }
-    }
-
-    # 2. Convertir el diccionario a texto con formato de árbol ASCII
-    arbol_formateado = generar_arbol_ascii("Proyecto_CentroDistribucion", estructura)
-
-    # 3. Retornar en la respuesta de la API
-    return {
-        "codigo": html_o_codigo_generado,
-        "arbol_estructura": arbol_formateado
-    }
