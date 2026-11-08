@@ -51,6 +51,36 @@ class ProjectOut(BaseModel):
     dataset_examples: int = 0
 
 
+def generar_arbol_ascii(nombre_raiz: str, estructura: dict) -> str:
+    """
+    Convierte una estructura de diccionario en formato de árbol ASCII.
+    Ejemplo de formato de entrada:
+    {
+        "index.html": None,
+        "Styles": {"style.css": None},
+        "Scripts": {"main.js": None, "util.js": None}
+    }
+    """
+    lineas = [f"{nombre_raiz}/", "│"]
+    
+    def _construir(nodo, prefijo=""):
+        elementos = list(nodo.keys())
+        total = len(elementos)
+        for i, nombre in enumerate(elementos):
+            es_ultimo = (i == total - 1)
+            conector = "└── " if es_ultimo else "├── "
+            hijo = nodo[nombre]
+            
+            if isinstance(hijo, dict):  # Es una carpeta
+                lineas.append(f"{prefijo}{conector}{nombre}/")
+                nuevo_prefijo = prefijo + ("    " if es_ultimo else "│   ")
+                _construir(hijo, nuevo_prefijo)
+            else:  # Es un archivo
+                lineas.append(f"{prefijo}{conector}{nombre}")
+                
+    _construir(estructura)
+    return "\n".join(lineas)
+
 def get_collection():
     uri = os.getenv("MONGO_URI", "mongodb://127.0.0.1:27017")
     db = os.getenv("MONGO_DB", "web_screenshot_builder")
@@ -335,3 +365,31 @@ def delete_project(project_id: str):
     except PyMongoError: raise HTTPException(503, "MongoDB no disponible.")
     if not result.deleted_count: raise HTTPException(404, "No existe ese proyecto.")
     return {"deleted": True, "id": project_id}
+
+
+@app.post("/predict")  # o el nombre que tenga tu ruta/endpoint
+async def predict(file: UploadFile = File(...)):
+    # ... tu código de procesamiento actual con el modelo/k-NN ...
+
+    # 1. Definir o recuperar la estructura de carpetas que devolvió el modelo/sistema
+    estructura = {
+        "index.html": None,
+        "Styles": {
+            "style.css": None
+        },
+        "Scripts": {
+            "util.js": None,
+            "Destino.js": None,
+            "Registro.js": None,
+            "main.js": None
+        }
+    }
+
+    # 2. Convertir el diccionario a texto con formato de árbol ASCII
+    arbol_formateado = generar_arbol_ascii("Proyecto_CentroDistribucion", estructura)
+
+    # 3. Retornar en la respuesta de la API
+    return {
+        "codigo": html_o_codigo_generado,
+        "arbol_estructura": arbol_formateado
+    }

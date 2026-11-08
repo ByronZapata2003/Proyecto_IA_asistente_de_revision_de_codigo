@@ -109,3 +109,16 @@ with tab_projects:
                     try:
                         r = requests.delete(API + "/projects/" + item["id"], timeout=10); r.raise_for_status(); st.session_state["projects"] = [p for p in st.session_state.get("projects", []) if p["id"] != item["id"]]; st.rerun()
                     except requests.RequestException as e: explain_error(e)
+
+# En frontend/app.py:
+if r.status_code == 200:
+    res_json = r.json()
+    
+    # Muestra el árbol formateado estilo consola oscura
+    if "arbol_estructura" in res_json:
+        st.markdown("### 📁 Estructura del Proyecto")
+        st.code(res_json["arbol_estructura"], language="text")
+
+    # Muestra el código recuperado/generado
+    st.markdown("### 💻 Código Resultante")
+    st.code(res_json.get("codigo", ""), language="html")
