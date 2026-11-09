@@ -205,7 +205,7 @@ def create_project(data: bytes, source: str):
         doc["id"] = str(saved.inserted_id)
         doc["created_at"] = created_at.isoformat()
     except PyMongoError:
-        raise HTTPException(503, "No se pudo guardar el proyecto. Inicia MongoDB local y verifica MONGO_URI en .env.")
+        raise HTTPException(503, "No se pudo guardar el proyecto. Verifica que MongoDB esté disponible y revisa MONGO_URI y el acceso de red en .env.")
     return doc
 
 
@@ -240,7 +240,7 @@ def list_projects(limit: int = 50):
         docs = list(get_collection().find({}, {"source": 1, "created_at": 1, "provider": 1, "model": 1}).sort("created_at", -1).limit(limit))
         return [{"id": str(d["_id"]), "source": d.get("source", ""), "created_at": d["created_at"].isoformat(), "provider": d["provider"], "model": d["model"]} for d in docs]
     except PyMongoError:
-        raise HTTPException(503, "MongoDB no disponible. Inicia MongoDB local y verifica MONGO_URI.")
+        raise HTTPException(503, "MongoDB no disponible. Verifica MONGO_URI y el acceso de red configurado para la base de datos.")
 
 
 @app.get("/projects/{project_id}")

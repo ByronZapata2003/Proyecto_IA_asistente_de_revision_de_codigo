@@ -7,7 +7,7 @@ El notebook entrena un índice visual k-NN con pares captura/HTML de WebSight. D
 ## Requisitos
 
 - Windows con Anaconda o Miniconda y Python 3.11.
-- MongoDB Community Server instalado y ejecutándose localmente.
+- Un cluster de MongoDB Atlas o MongoDB Community Server ejecutándose localmente.
 - Una clave de API de OpenAI con acceso a un modelo de visión.
 - Conexión a Internet para instalar dependencias, obtener la muestra del dataset y generar código.
 
@@ -25,7 +25,16 @@ copy .env.example .env
 notepad .env
 ```
 
-En `.env`, configura `OPENAI_API_KEY` y, si tu cuenta requiere otro modelo, `OPENAI_MODEL`. No publiques ese archivo. MongoDB usa `mongodb://127.0.0.1:27017` y la base `web_screenshot_builder` por defecto.
+En `.env`, configura `OPENAI_API_KEY` y, si tu cuenta requiere otro modelo, `OPENAI_MODEL`. No publiques ese archivo: contiene credenciales y ya está excluido por `.gitignore`.
+
+### Configurar MongoDB Atlas
+
+1. Crea un cluster en MongoDB Atlas y un usuario de base de datos con permisos de lectura y escritura sobre la base que usarás.
+2. En **Network Access**, permite la dirección IP desde la que ejecutarás la API. Para trabajar desde distintas redes, actualiza esta regla cuando cambie tu IP; evita permitir `0.0.0.0/0` salvo que comprendas que abre el acceso desde cualquier IP.
+3. En **Connect → Drivers**, copia la cadena de conexión para Python/PyMongo y pégala como valor de `MONGO_URI` en `.env`, sustituyendo el usuario, contraseña y host de ejemplo. Si la contraseña contiene caracteres especiales, usa su versión codificada para URL.
+4. Deja `MONGO_DB=web_screenshot_builder` o cámbialo por el nombre de base de datos deseado. Atlas creará la base y la colección `projects` al guardar el primer proyecto.
+
+La plantilla `.env.example` incluye una URI Atlas con campos por reemplazar. No inicies la API hasta completar la URI. Para volver a MongoDB local, cambia `MONGO_URI` a `mongodb://127.0.0.1:27017`.
 
 ## Descargar el dataset y entrenar
 
@@ -41,7 +50,7 @@ WebSight contiene pares sintéticos de capturas y HTML/Tailwind bajo CC BY 4.0. 
 
 ## Iniciar la aplicación
 
-Deja MongoDB ejecutándose. Abre dos ventanas de Anaconda Prompt, activa el entorno y ejecuta ambos comandos desde la carpeta del proyecto.
+Con Atlas, verifica que la URI y el acceso de red estén configurados. Con MongoDB local, deja el servidor ejecutándose. Abre dos ventanas de Anaconda Prompt, activa el entorno y ejecuta ambos comandos desde la carpeta del proyecto.
 
 **Ventana 1 — API:**
 
