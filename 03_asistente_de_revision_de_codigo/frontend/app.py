@@ -20,9 +20,9 @@ st.caption("Genera archivos frontend con un modelo de visión. La captura no con
 
 def explain_error(exc):
     if isinstance(exc, requests.HTTPError):
-        try: 
+        try:
             st.error(exc.response.json().get("detail", str(exc)))
-        except Exception: 
+        except Exception:
             st.error(str(exc))
     elif isinstance(exc, requests.Timeout):
         st.warning(
@@ -37,9 +37,9 @@ def bundle(project):
     mem = io.BytesIO()
     with zipfile.ZipFile(mem, "w", zipfile.ZIP_DEFLATED) as z:
         z.writestr(
-            "index.html", 
-            '<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="Styles/style.css"><title>Reconstrucción</title></head><body>\n' 
-            + project["html"] + 
+            "index.html",
+            '<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="Styles/style.css"><title>Reconstrucción</title></head><body>\n'
+            + project["html"] +
             '\n<script src="Scripts/main.js"></script></body></html>'
         )
         z.writestr("Styles/style.css", project["css"])
@@ -54,17 +54,17 @@ tab_new, tab_projects = st.tabs(["Crear reconstrucción", "Proyectos guardados"]
 
 with tab_new:
     mode = st.radio("Origen", ["Subir capturas", "Capturar URL pública"], horizontal=True)
-    
+
     if mode == "Subir capturas":
         if "num_capturas" not in st.session_state:
             st.session_state["num_capturas"] = 1
 
         uploaded_files = []
-        
+
         for i in range(st.session_state["num_capturas"]):
             file_uploaded = st.file_uploader(
-                f"Subir Imagen {i + 1}", 
-                type=["jpg", "jpeg", "png", "webp"], 
+                f"Subir Imagen {i + 1}",
+                type=["jpg", "jpeg", "png", "webp"],
                 key=f"uploader_{i}"
             )
             if file_uploaded:
@@ -150,7 +150,7 @@ with tab_projects:
             st.session_state["projects"] = r.json()
         except requests.RequestException as e:
             explain_error(e)
-            
+
     for item in st.session_state.get("projects", []):
         with st.expander(f"{item['created_at']} · {item['source']} · {item['model']}"):
             a, b = st.columns([4, 1])

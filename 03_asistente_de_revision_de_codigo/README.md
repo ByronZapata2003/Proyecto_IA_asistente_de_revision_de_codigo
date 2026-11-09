@@ -8,7 +8,7 @@ La imagen no revela el código fuente original. El resultado es una aproximació
 
 - **Streamlit**: carga de imagen/URL, comparación, código, descarga ZIP y gestión de proyectos.
 - **FastAPI**: validación, captura con Playwright, llamada a Gemini `generateContent` u OpenAI Responses API y endpoints de proyectos.
-- **MongoDB local**: documentos en `web_screenshot_builder.projects`; se guarda fecha, origen, proveedor/modelo y código. No se guardan claves API ni la imagen original.
+- **MongoDB**: local o Atlas; documentos en `web_screenshot_builder.projects` con fecha, origen, proveedor/modelo y código. No se guardan claves API ni la imagen original.
 - **Vista previa**: documento generado dentro de un `iframe` con `sandbox="allow-scripts"` y origen opaco. El backend nunca ejecuta código generado.
 
 ## Referencias opcionales de WebSight
@@ -24,13 +24,13 @@ python -c "from backend.ml import train; model = train(); print('Índice entrena
 
 La primera descarga puede transferir un shard remoto grande aunque se guarde una muestra pequeña. El dataset tiene licencia CC BY 4.0; conserva la atribución si distribuyes el modelo o la aplicación. El índice se guarda localmente en `models/` y no debe subirse al repositorio.
 
-## Requisitos en macOS
+## Preparar el entorno en macOS
 
 1. Instala Anaconda o Miniconda para macOS y MongoDB Community Server. Para inspeccionar datos, instala MongoDB Compass.
 2. En Anaconda Terminal:
 
 ```bash
-cd "/Users/javierlara/Documents/PROYECTO BD2/Proyecto_IA_asistente_de_revision_de_codigo/03_asistente_de_revision_de_codigo"
+cd "/ruta/al/repositorio/03_asistente_de_revision_de_codigo"
 conda create -n screenshot-ui python=3.11 -y
 conda activate screenshot-ui
 python -m pip install -r requirements.txt
@@ -38,18 +38,43 @@ python -m playwright install chromium
 cp .env.example .env
 ```
 
-3. Para probar Gemini, crea una clave en [Google AI Studio](https://aistudio.google.com/app/apikey), y configura en `.env` `AI_PROVIDER=gemini`, `GEMINI_API_KEY` y `GEMINI_MODEL=gemini-3.5-flash-lite`. La API de Gemini ofrece un nivel gratuito para ciertos modelos y cuentas elegibles, con cuotas que pueden cambiar; confirma que el proyecto esté en el nivel gratuito en AI Studio. En ese nivel Google puede usar el contenido enviado para mejorar sus productos, así que evita capturas sensibles. Si prefieres OpenAI, usa `AI_PROVIDER=openai`, `OPENAI_API_KEY` y `OPENAI_MODEL`. No pegues claves en el notebook ni las subas al repositorio. También configura `MONGO_URI`, `MONGO_DB` y `API_URL` si necesitas cambiar los valores locales.
+3. Para probar Gemini, crea una clave en [Google AI Studio](https://aistudio.google.com/app/apikey), y configura en `.env` `AI_PROVIDER=gemini`, `GEMINI_API_KEY` y `GEMINI_MODEL` (la plantilla propone `gemini-1.5-flash`). La API de Gemini ofrece un nivel gratuito para ciertos modelos y cuentas elegibles, con cuotas que pueden cambiar; confirma que el proyecto esté en el nivel gratuito en AI Studio. En ese nivel Google puede usar el contenido enviado para mejorar sus productos, así que evita capturas sensibles. Si prefieres OpenAI, usa `AI_PROVIDER=openai`, `OPENAI_API_KEY` y `OPENAI_MODEL`. No pegues claves en el notebook ni las subas al repositorio. También configura `MONGO_URI`, `MONGO_DB` y `API_URL` si necesitas cambiar los valores locales.
 4. Inicia MongoDB localmente. Si instalaste Homebrew:
 
 ```bash
 brew services start mongodb-community
 ```
 
-Si usas el instalador oficial, inicia el servicio MongoDB según el método de instalación y confirma que escucha en `127.0.0.1:27017`.
+Si usas el instalador oficial, inicia el servicio MongoDB según el método de instalación y confirma que escucha en `127.0.0.1:27017`. Este paso solo aplica cuando usas MongoDB local.
+
+## Preparar el entorno en Windows
+
+Abre **Anaconda Prompt** en la raíz del repositorio y ejecuta:
+
+```bat
+cd /d "03_asistente_de_revision_de_codigo"
+conda create -n screenshot-ui python=3.11 -y
+conda activate screenshot-ui
+python -m pip install -r requirements.txt
+python -m playwright install chromium
+copy .env.example .env
+notepad .env
+```
+
+Completa `.env` con la clave del proveedor elegido y la URI de Atlas o la URI de MongoDB local. No publiques `.env` ni pegues claves en el notebook.
+
+## Configurar MongoDB Atlas
+
+1. Crea un cluster de Atlas y un usuario de base de datos con permisos de lectura y escritura.
+2. En **Network Access**, permite la IP pública desde la que ejecutarás la API. Si cambia tu red, actualiza la regla; evita `0.0.0.0/0` salvo que necesites y comprendas el acceso desde cualquier IP.
+3. En **Connect → Drivers**, copia la URI para Python/PyMongo. Pégala como `MONGO_URI` en `.env` y sustituye el usuario, la contraseña y el host del cluster. Si la contraseña incluye caracteres especiales, codifícalos para URL.
+4. Deja `MONGO_DB=web_screenshot_builder` o elige otro nombre. La base y la colección `projects` se crean al guardar el primer proyecto.
+
+La plantilla `.env.example` deja una URI de Atlas lista para completar. No inicies la API hasta sustituir todos sus campos. Para usar MongoDB local, configura `MONGO_URI=mongodb://127.0.0.1:27017`; si usas Atlas, no hace falta iniciar un servidor MongoDB local.
 
 ## Iniciar la aplicación
 
-Abre tres terminales, activa `conda activate screenshot-ui` y entra a la carpeta del proyecto en cada una.
+Abre tres terminales, activa `conda activate screenshot-ui` y entra a la carpeta del proyecto en cada una. Si usas Atlas, omite el terminal de MongoDB local.
 
 **Terminal 1 — MongoDB**, solo si no está iniciado como servicio:
 
