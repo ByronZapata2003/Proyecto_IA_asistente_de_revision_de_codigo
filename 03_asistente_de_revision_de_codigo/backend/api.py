@@ -233,10 +233,10 @@ def rate_limit_detail(exc: Exception) -> str:
 
 def generate(images: List[Image.Image]):
     provider = os.getenv("AI_PROVIDER", "openai").strip().lower()
-    
+
     # Unir todas las capturas subidas en una sola imagen continua
     combined_image = combinar_imagenes_verticalmente(images)
-    
+
     examples = retrieve_examples(combined_image, limit=2)
     context = ""
     if examples:
@@ -352,7 +352,7 @@ def create_project_from_images(image_bytes_list: List[bytes], source: str):
         doc["id"] = str(saved.inserted_id)
         doc["created_at"] = created_at.isoformat()
     except PyMongoError:
-        raise HTTPException(503, "No se pudo guardar el proyecto en MongoDB.")
+        raise HTTPException(503, "No se pudo guardar el proyecto. Verifica que MongoDB esté disponible y revisa MONGO_URI y el acceso de red en .env.")
     return doc
 
 
@@ -396,7 +396,7 @@ def list_projects(limit: int = 50):
     try:
         docs = list(get_collection().find({}, {"source": 1, "created_at": 1, "provider": 1, "model": 1}).sort("created_at", -1).limit(limit))
         return [{"id": str(d["_id"]), "source": d.get("source", ""), "created_at": d["created_at"].isoformat(), "provider": d["provider"], "model": d["model"]} for d in docs]
-    except PyMongoError: raise HTTPException(503, "MongoDB no disponible.")
+    except PyMongoError: raise HTTPException(503, "MongoDB no disponible. Verifica MONGO_URI y el acceso de red configurado para la base de datos.")
 
 
 @app.get("/projects/{project_id}")
@@ -404,7 +404,7 @@ def get_project(project_id: str):
     from bson import ObjectId
     if not ObjectId.is_valid(project_id): raise HTTPException(422, "ID inválido.")
     try: doc = get_collection().find_one({"_id": ObjectId(project_id)})
-    except PyMongoError: raise HTTPException(503, "MongoDB no disponible.")
+    except PyMongoError: raise HTTPException(503, "MongoDB no disponible. Verifica MONGO_URI y el acceso de red configurado para la base de datos.")
     if not doc: raise HTTPException(404, "Proyecto no encontrado.")
     doc["id"] = str(doc.pop("_id")); doc["created_at"] = doc["created_at"].isoformat()
     return doc
